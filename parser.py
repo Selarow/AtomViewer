@@ -9,7 +9,6 @@ class XML:
         self.num_atoms = int(xml.find("./atominfo/atoms").text.strip())
         self.num_types = int(xml.find("./atominfo/types").text.strip())
         self.divisions = xml.find("./kpoints/generation/v[@name='divisions']").text ###
-
         self.PREC = xml.find("./incar/i[@name='PREC']").text.strip()
         self.ALGO = xml.find("./incar/i[@name='ALGO']").text.strip()
         self.NSIM = int(xml.find("./incar/i[@name='NSIM']").text.strip())
@@ -89,3 +88,21 @@ class XML:
 
             self.t.append(i*self.POTIM)
             i += 1
+        
+        self.num_blocs = len(self.position)
+
+
+    def save(self, file):
+        f = open(file,"a")
+
+        for i in range(1, self.num_blocs+1):
+            f.write(str(self.energy[i][0]))
+            f.write(":")
+            f.write(str(self.num_atoms))
+            f.write(":")
+            f.write(str(self.num_types))
+            f.write(":")
+            f.write(str(self.position[i]))
+            f.write("\n")
+        
+        f.close()
