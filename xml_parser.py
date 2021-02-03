@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 
-class XML:
+
+
+class Xml:
     def parse(self, file):
         xml = ET.parse(file)
 
