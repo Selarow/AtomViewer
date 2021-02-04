@@ -14,6 +14,7 @@ class Xml:
         self.PREC = xml.find("./incar/i[@name='PREC']").text.strip()
         self.ALGO = xml.find("./incar/i[@name='ALGO']").text.strip()
         self.NSIM = int(xml.find("./incar/i[@name='NSIM']").text.strip())
+        self.NSW = int(xml.find("./incar/i[@name='NSW']").text.strip())
         self.ENCUT = float(xml.find("./incar/i[@name='ENCUT']").text.strip())
         self.POTIM = float(xml.find("./incar/i[@name='POTIM']").text.strip())
         self.TEBEG = float(xml.find("./incar/i[@name='TEBEG']").text.strip())

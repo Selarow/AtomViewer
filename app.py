@@ -48,23 +48,51 @@ class Window(QMainWindow):
     
 
     def open(self):
-        file_name = QFileDialog.getOpenFileName(self, "OpenFile")[0]
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File")
 
-        try:
-            start_time = time.time()
-            xml = Xml()
-            xml.parse(file_name)
-            print("--- %s seconds ---" % (time.time() - start_time))
+        if file_name:
+            try:
+                start_time = time.time()
+                self.xml = Xml()
+                self.xml.parse(file_name)
+                print("EXEC TIME :", time.time() - start_time, "seconds")
+                self.plot()
 
-            print(xml.POTIM)
-
-        except:
-            raise Exception("Invalid file")
+            except:
+                raise Exception("Invalid file")
 
 
     def save(self):
-        pass
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "data.txt", ".txt")
 
+        if file_name:
+            try:
+                x = self.xml
+                f = open(file_name, "a")
+
+                for i in range(1, x.NSW+1):
+                    f.write(str(x.energy[i][0]) + ":" + str(x.num_atoms) + ":" + str(x.num_types) + ":" + str(x.position[i]) + "\n")
+            
+                f.close()
+            
+            except AttributeError:
+                raise Exception("No XML file loaded")
+    
+
+    def plot(self):
+        e_fr_energy = []
+        e_wo_entrp = []
+        total = []
+
+        for i in range(1, self.xml.NSW+1):
+            e_fr_energy.append(self.xml.energy[i][0])
+            e_wo_entrp.append(self.xml.energy[i][1])
+            total.append(self.xml.energy[i][2])
+        
+        self.graph00.plot(self.xml.t, e_fr_energy)
+        self.graph01.plot(self.xml.t, e_wo_entrp)
+        self.graph10.plot(self.xml.t, total)
+        
 
 
 
