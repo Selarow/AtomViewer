@@ -16,6 +16,10 @@ class Window(QMainWindow):
         self.setGeometry(100, 100, 1600, 900)
         self.UI()
         self.show()
+        self.DAT = 0
+        self.DAT_I = 1
+        self.DAT_POTIM = 1
+        self.colors = ["r", "y", "g", "c", "b", "m"]
 
 
 
@@ -30,9 +34,17 @@ class Window(QMainWindow):
         control_widget.setLayout(control_layout)
         main_layout.addWidget(control_widget, 2, 0)
 
-        open_button = QPushButton("Open", self)
-        open_button.clicked.connect(self.open)
-        control_layout.addWidget(open_button)
+        open_vasprun_button = QPushButton("Open Vasprun", self)
+        open_vasprun_button.clicked.connect(self.open_vasprun)
+        control_layout.addWidget(open_vasprun_button)
+
+        open_dat_button = QPushButton("Open Dat", self)
+        open_dat_button.clicked.connect(self.open_dat)
+        control_layout.addWidget(open_dat_button)
+
+        clear_button = QPushButton("Clear", self)
+        clear_button.clicked.connect(self.clear)
+        control_layout.addWidget(clear_button)
 
         save_button = QPushButton("Save", self)
         save_button.clicked.connect(self.save)
@@ -72,7 +84,7 @@ class Window(QMainWindow):
 
 
 
-    def open(self):
+    def open_vasprun(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "data", "XML Files (*.xml)")
 
         if file_name:
@@ -80,7 +92,40 @@ class Window(QMainWindow):
             self.xml = XML()
             self.xml.parse(file_name)
             print("EXEC TIME:", time.time() - start_time, "seconds")
-            self.plot()
+            self.DAT_POTIM = self.xml.POTIM
+            self.plot_vasprun()
+
+
+
+    def open_dat(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "data", "DAT Files (*.dat)")
+
+        if file_name:
+            try:
+                f = open(file_name, "r")
+                X = []
+                T = []
+
+                for l in f:
+                    line = l.split()
+                    if line:
+                        X.append(self.DAT_I*self.DAT_POTIM)
+                        T.append(float(line[2]))
+                        self.DAT_I += 1
+                
+                self.graph11.plot(X, T, pen = pg.mkPen(self.colors[self.DAT%len(self.colors)], width = 2))
+                self.DAT += 1
+
+
+            except:
+                raise Exception("Invalid DAT file")
+
+
+
+    def clear(self):
+        self.DAT = 0
+        self.DAT_I = 1
+        self.graph11.clear()
 
 
 
@@ -90,13 +135,14 @@ class Window(QMainWindow):
         if file_name:
             try:
                 self.xml.save(file_name)
+                print("DATA SAVED:", file_name)
             
             except AttributeError:
-                raise Exception("No XML file loaded")
+                raise Exception("Vasprun not found")
 
 
 
-    def plot(self):
+    def plot_vasprun(self):
         e_fr_energy = []
         e_wo_entrp = []
         total = []
@@ -109,10 +155,9 @@ class Window(QMainWindow):
         self.graph00.clear()
         self.graph01.clear()
         self.graph10.clear()
-        self.graph11.clear()
-        self.graph00.plot(self.xml.t, e_fr_energy)
-        self.graph01.plot(self.xml.t, e_wo_entrp)
-        self.graph10.plot(self.xml.t, total)
+        self.graph00.plot(self.xml.t, e_fr_energy, pen = pg.mkPen(width = 2))
+        self.graph01.plot(self.xml.t, e_wo_entrp, pen = pg.mkPen(width = 2))
+        self.graph10.plot(self.xml.t, total, pen = pg.mkPen(width = 2))
 
 
 

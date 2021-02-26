@@ -115,10 +115,12 @@ class XML:
                     self.basis[tmp_i] = tmp_basis
                     self.position[tmp_i] = tmp_position
                     element.clear()
+                    
+            print("SUCCESS: Vasprun loaded")
 
 
         except ET.ParseError:
-            print("WARNING: Incomplete XML file")
+            print("WARNING: Incomplete/invalid XML file")
 
 
 
