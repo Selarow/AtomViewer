@@ -1,4 +1,4 @@
-from xml_parser import Xml
+from xml_parser import XML
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -8,15 +8,17 @@ import sys
 
 
 
+
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Atom Visualisation")
+        self.setWindowTitle("Atom Viewer")
         self.setGeometry(100, 100, 1280, 720)
         self.UI()
         self.show()
 
-    
+
+
     def UI(self):
         main_widget = QWidget()
         main_layout = QGridLayout()
@@ -45,7 +47,8 @@ class Window(QMainWindow):
         main_layout.addWidget(self.graph11, 1, 1)
 
         self.setCentralWidget(main_widget)
-    
+
+
 
     def open(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open File")
@@ -53,7 +56,7 @@ class Window(QMainWindow):
         if file_name:
             try:
                 start_time = time.time()
-                self.xml = Xml()
+                self.xml = XML()
                 self.xml.parse(file_name)
                 print("EXEC TIME :", time.time() - start_time, "seconds")
                 self.plot()
@@ -62,29 +65,25 @@ class Window(QMainWindow):
                 raise Exception("Invalid file")
 
 
+
     def save(self):
         file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "data.txt", ".txt")
 
         if file_name:
             try:
-                x = self.xml
-                f = open(file_name, "a")
-
-                for i in range(1, x.NSW+1):
-                    f.write(str(x.energy[i][0]) + ":" + str(x.num_atoms) + ":" + str(x.num_types) + ":" + str(x.position[i]) + "\n")
-            
-                f.close()
+                self.xml.save(file_name)
             
             except AttributeError:
                 raise Exception("No XML file loaded")
-    
+
+
 
     def plot(self):
         e_fr_energy = []
         e_wo_entrp = []
         total = []
 
-        for i in range(1, self.xml.NSW+1):
+        for i in range(1, self.xml.i):
             e_fr_energy.append(self.xml.energy[i][0])
             e_wo_entrp.append(self.xml.energy[i][1])
             total.append(self.xml.energy[i][2])
@@ -92,7 +91,7 @@ class Window(QMainWindow):
         self.graph00.plot(self.xml.t, e_fr_energy)
         self.graph01.plot(self.xml.t, e_wo_entrp)
         self.graph10.plot(self.xml.t, total)
-        
+
 
 
 
