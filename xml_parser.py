@@ -19,7 +19,6 @@ class XML:
     def parse(self, file):
         try:
             for _, element in ET.iterparse(file):
-
                 #GENERATOR
                 if element.tag == "generator":
                     self.date = element.find("i[@name='date']").text
@@ -53,7 +52,6 @@ class XML:
 
                 #CALCULATION
                 elif element.tag == "calculation":
-
                     #BASIS
                     i_basis = []
                     for v in element.find("structure/crystal/varray[@name='basis']"):
@@ -120,7 +118,7 @@ class XML:
 
 
         except ET.ParseError:
-            print("Incomplete XML file")
+            print("WARNING: Incomplete XML file")
 
 
 
