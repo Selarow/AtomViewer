@@ -13,7 +13,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Atom Viewer")
-        self.setGeometry(100, 50, 1600, 980)
+        self.setGeometry(50, 50, 1600, 980)
         #self.setWindowFlags(Qt.FramelessWindowHint)
         stylesheet = open("data/style.css", "r").read()
         self.setStyleSheet(stylesheet)
@@ -25,33 +25,28 @@ class Window(QMainWindow):
         self.DAT_I = 1
         self.DAT_POTIM = 1
         self.colors = ["r", "y", "g", "c", "b", "m"]
-        self.dialog_visible = False
+        self.dat_visible = False
 
 
 
     def UI(self):
         #WIDGETS/LAYOUTS
         main_widget = QWidget()
-        main_layout = QGridLayout()
-        main_widget.setLayout(main_layout)
+        main_layout = QGridLayout(main_widget)
         self.setCentralWidget(main_widget)
 
         control_widget = QWidget()
-        control_layout = QHBoxLayout()
-        control_widget.setLayout(control_layout)
-        main_layout.addWidget(control_widget, 2, 0)
+        control_layout = QHBoxLayout(control_widget)
+        main_layout.addWidget(control_widget, 2, 1)
 
-        self.dialog = QDialog(self)
-        dialog_layout = QVBoxLayout()
-        self.dialog.setLayout(dialog_layout)
-        self.dialog.setWindowTitle("DAT Editor")
-        self.dialog.setGeometry(1600, 0, 700, 980)
-        self.dialog.setWindowFlags(Qt.FramelessWindowHint)
+        dat_widget = QWidget(self)
+        dat_layout = QVBoxLayout(dat_widget)
+        dat_widget.setGeometry(-700, 0, 700, 980)
+        dat_widget.setObjectName("dat")
 
-        dialog_control_widget = QWidget()
-        dialog_control_layout = QHBoxLayout()
-        dialog_control_widget.setLayout(dialog_control_layout)
-        dialog_layout.addWidget(dialog_control_widget)
+        dat_control_widget = QWidget()
+        dat_control_layout = QHBoxLayout(dat_control_widget)
+        dat_layout.addWidget(dat_control_widget)
 
 
         #BUTTONS
@@ -60,16 +55,16 @@ class Window(QMainWindow):
         control_layout.addWidget(open_vasprun_button)
 
         dat_button = QPushButton("DAT", self)
-        dat_button.clicked.connect(self.dialog_dat)
+        dat_button.clicked.connect(self.toggle_dat)
         control_layout.addWidget(dat_button)
 
-        open_dat_button = QPushButton("Open Dat", self)
+        open_dat_button = QPushButton("Open .dat", self)
         open_dat_button.clicked.connect(self.open_dat)
-        dialog_control_layout.addWidget(open_dat_button)
+        dat_control_layout.addWidget(open_dat_button)
 
         clear_button = QPushButton("Clear", self)
         clear_button.clicked.connect(self.clear)
-        dialog_control_layout.addWidget(clear_button)
+        dat_control_layout.addWidget(clear_button)
 
         save_button = QPushButton("Save", self)
         save_button.clicked.connect(self.save)
@@ -77,14 +72,14 @@ class Window(QMainWindow):
 
 
         #ANIMATIONS
-        self.close_anim = QPropertyAnimation(self.dialog, b"pos")
+        self.close_anim = QPropertyAnimation(dat_widget, b"pos")
         self.close_anim.setEasingCurve(QEasingCurve.InOutCubic)
-        self.close_anim.setEndValue(QPoint(1600,0))
+        self.close_anim.setEndValue(QPoint(-700,0))
         self.close_anim.setDuration(1000)
 
-        self.open_anim = QPropertyAnimation(self.dialog, b"pos")
+        self.open_anim = QPropertyAnimation(dat_widget, b"pos")
         self.open_anim.setEasingCurve(QEasingCurve.InOutCubic)
-        self.open_anim.setEndValue(QPoint(900,0))
+        self.open_anim.setEndValue(QPoint(0,0))
         self.open_anim.setDuration(1000)
 
 
@@ -134,15 +129,15 @@ class Window(QMainWindow):
         #self.graph2.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
         #self.graph3.setLabel("bottom", "", units = "x", **labelStyle)
 
-        self.graph0.setLabel("left", "energy", units = "y", **labelStyle)
-        self.graph1.setLabel("left", "entrp", units = "y", **labelStyle)
-        self.graph2.setLabel("left", "total", units = "y", **labelStyle)
-        self.graph3.setLabel("left", "", units = "y", **labelStyle)
+        self.graph0.setLabel("left", "T", units = "y", **labelStyle)
+        self.graph1.setLabel("left", "EK", units = "y", **labelStyle)
+        self.graph2.setLabel("left", "SP", units = "y", **labelStyle)
+        self.graph3.setLabel("left", "SK", units = "y", **labelStyle)
 
-        dialog_layout.addWidget(self.graph0)
-        dialog_layout.addWidget(self.graph1)
-        dialog_layout.addWidget(self.graph2)
-        dialog_layout.addWidget(self.graph3)
+        dat_layout.addWidget(self.graph0)
+        dat_layout.addWidget(self.graph1)
+        dat_layout.addWidget(self.graph2)
+        dat_layout.addWidget(self.graph3)
 
 
 
@@ -159,14 +154,14 @@ class Window(QMainWindow):
 
 
 
-    def dialog_dat(self):
-        if self.dialog_visible:
+    def toggle_dat(self):
+        if self.dat_visible:
             self.close_anim.start()
-            self.dialog_visible = False
+            self.dat_visible = False
 
         else:
             self.open_anim.start()
-            self.dialog_visible = True
+            self.dat_visible = True
 
 
 
