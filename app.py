@@ -14,6 +14,9 @@ class Window(QMainWindow):
         super().__init__()
         self.setWindowTitle("Atom Viewer")
         self.setGeometry(100, 50, 1600, 980)
+        #self.setWindowFlags(Qt.FramelessWindowHint)
+        stylesheet = open("data/style.css", "r").read()
+        self.setStyleSheet(stylesheet)
         self.UI()
         self.show()
 
@@ -22,11 +25,12 @@ class Window(QMainWindow):
         self.DAT_I = 1
         self.DAT_POTIM = 1
         self.colors = ["r", "y", "g", "c", "b", "m"]
+        self.dialog_visible = False
 
 
 
     def UI(self):
-        #LAYOUTS
+        #WIDGETS/LAYOUTS
         main_widget = QWidget()
         main_layout = QGridLayout()
         main_widget.setLayout(main_layout)
@@ -41,7 +45,8 @@ class Window(QMainWindow):
         dialog_layout = QVBoxLayout()
         self.dialog.setLayout(dialog_layout)
         self.dialog.setWindowTitle("DAT Editor")
-        self.dialog.setGeometry(1000, 50, 700, 980)
+        self.dialog.setGeometry(1600, 0, 700, 980)
+        self.dialog.setWindowFlags(Qt.FramelessWindowHint)
 
         dialog_control_widget = QWidget()
         dialog_control_layout = QHBoxLayout()
@@ -55,7 +60,7 @@ class Window(QMainWindow):
         control_layout.addWidget(open_vasprun_button)
 
         dat_button = QPushButton("DAT", self)
-        dat_button.clicked.connect(self.dialog.show)
+        dat_button.clicked.connect(self.dialog_dat)
         control_layout.addWidget(dat_button)
 
         open_dat_button = QPushButton("Open Dat", self)
@@ -71,9 +76,21 @@ class Window(QMainWindow):
         control_layout.addWidget(save_button)
 
 
+        #ANIMATIONS
+        self.close_anim = QPropertyAnimation(self.dialog, b"pos")
+        self.close_anim.setEasingCurve(QEasingCurve.InOutCubic)
+        self.close_anim.setEndValue(QPoint(1600,0))
+        self.close_anim.setDuration(1000)
+
+        self.open_anim = QPropertyAnimation(self.dialog, b"pos")
+        self.open_anim.setEasingCurve(QEasingCurve.InOutCubic)
+        self.open_anim.setEndValue(QPoint(900,0))
+        self.open_anim.setDuration(1000)
+
+
         #GRAPHS VASPRUN
-        font = QFontDatabase.addApplicationFont("data/cmunti.ttf")
-        labelStyle = {'color': '#969696', 'font-size': '18px', 'font-family': 'CMU Serif'}
+        font = QFontDatabase.addApplicationFont("data/lmromanb.ttf")
+        labelStyle = {'color': '#969696', 'font-size': '16px', 'font-family': 'LM Roman 10'}
 
         self.graph00 = pg.PlotWidget()
         self.graph01 = pg.PlotWidget()
@@ -139,6 +156,17 @@ class Window(QMainWindow):
             print("EXEC TIME:", time.time() - start_time, "seconds")
             self.DAT_POTIM = self.xml.POTIM
             self.plot_vasprun()
+
+
+
+    def dialog_dat(self):
+        if self.dialog_visible:
+            self.close_anim.start()
+            self.dialog_visible = False
+
+        else:
+            self.open_anim.start()
+            self.dialog_visible = True
 
 
 
@@ -221,7 +249,5 @@ class Window(QMainWindow):
 
 
 app = QApplication(sys.argv)
-stylesheet = open("data/style.css", "r").read()
-app.setStyleSheet(stylesheet)
 window = Window()
 sys.exit(app.exec())
