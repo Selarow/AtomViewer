@@ -11,8 +11,9 @@ class XML:
         self.stress = dict()
         self.volume = dict()
         self.energy = dict()
-        self.t = []
-        self.i = 1
+        self.t = dict()
+        self.block = 1
+        self.POTIM = 1
 
 
 
@@ -53,53 +54,54 @@ class XML:
                 #CALCULATION
                 elif element.tag == "calculation":
                     #BASIS
-                    i_basis = []
+                    basis = []
                     for v in element.find("structure/crystal/varray[@name='basis']"):
-                        i_basis.append([float(k) for k in v.text.split()])
-                    self.basis[self.i] = i_basis
+                        basis.append([float(k) for k in v.text.split()])
+                    self.basis[self.block] = basis
 
                     #POSITION
-                    i_position = []
+                    position = []
                     for v in element.find("structure/varray[@name='positions']"):
-                        i_position.append([float(k) for k in v.text.split()])
-                    self.position[self.i] = i_position
+                        position.append([float(k) for k in v.text.split()])
+                    self.position[self.block] = position
 
                     #FORCE
-                    i_force = []
+                    force = []
                     for v in element.find("varray[@name='forces']"):
-                        i_force.append([float(k) for k in v.text.split()])
-                    self.force[self.i] = i_force
+                        force.append([float(k) for k in v.text.split()])
+                    self.force[self.block] = force
 
                     #STRESS
-                    i_stress = []
+                    stress = []
                     for v in element.find("varray[@name='stress']"):
-                        i_stress.append([float(k) for k in v.text.split()])
-                    self.stress[self.i] = i_stress
+                        stress.append([float(k) for k in v.text.split()])
+                    self.stress[self.block] = stress
 
                     #VOLUME
-                    self.volume[self.i] = float(element.find("structure/crystal/i[@name='volume']").text)
+                    self.volume[self.block] = float(element.find("structure/crystal/i[@name='volume']").text)
 
                     #ENERGY
-                    self.energy[self.i] = [float(element.find("energy/i[@name='e_fr_energy']").text),
+                    self.energy[self.block] = [float(element.find("energy/i[@name='e_fr_energy']").text),
                                            float(element.find("energy/i[@name='e_wo_entrp']").text),
                                            float(element.find("energy/i[@name='total']").text)]
 
                     #VARIABLES
-                    self.t.append(self.i*self.POTIM)
-                    self.i += 1
+                    self.t[self.block] = self.block * self.POTIM
+                    self.block += 1
                     element.clear()
 
 
                 #INITIALPOS/FINALPOS
+                """
                 elif element.tag == "structure" and "name" in element.attrib and (element.attrib["name"] == "initialpos" or element.attrib["name"] == "finalpos"):
                     tmp_basis = []
                     tmp_position = []
                     
                     if element.attrib["name"] == "initialpos":
-                        tmp_i = 0
+                        tmp_block = 0
 
                     else:
-                        tmp_i = self.i
+                        tmp_block = self.block
 
                     #BASIS
                     for v in element.find("crystal/varray[@name='basis']"):
@@ -110,24 +112,25 @@ class XML:
                         tmp_position.append([float(k) for k in v.text.split()])
 
                     #VOLUME
-                    self.volume[tmp_i] = float(element.find("crystal/i[@name='volume']").text)
+                    self.volume[tmp_block] = float(element.find("crystal/i[@name='volume']").text)
                     
-                    self.basis[tmp_i] = tmp_basis
-                    self.position[tmp_i] = tmp_position
+                    self.basis[tmp_block] = tmp_basis
+                    self.position[tmp_block] = tmp_position
                     element.clear()
+                """
                     
             print("SUCCESS: Vasprun loaded")
 
 
         except ET.ParseError:
-            print("WARNING: Incomplete/invalid XML file")
+            print(f"WARNING: Incomplete/invalid XML file ({file})")
 
 
 
     def save(self, file):
         f = open(file, "a")
 
-        for i in range(1, self.i):
+        for i in range(1, self.block):
             f.write(f"{self.energy[i][0]}:{self.num_atoms}:{self.num_types}:{self.position[i]}\n")
         
         f.close()
