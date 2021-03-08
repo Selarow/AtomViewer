@@ -1,3 +1,3 @@
 ## Dependencies
-- PyQt `pip install PyQt5`
-- PyQtGraph `pip install PyQtGraph`
+- PyQt `pip3 install PyQt5`
+- PyQtGraph `pip3 install PyQtGraph`
