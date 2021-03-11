@@ -9,7 +9,6 @@ class DAT:
         self.SP = []
         self.SK = []
         self.block = 1
-        self.POTIM = 1
         DAT.num = 0
 
 
