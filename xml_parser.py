@@ -135,6 +135,6 @@ class XML:
         f = open(file, "a")
 
         for i in range(1, self.block):
-            f.write(f"{self.energy[i][0]}:{self.num_atoms}:{self.num_types}:{self.position[i]}\n")
+            f.write(f"{self.e_fr_energy[i]}:{self.num_atoms}:{self.num_types}:{self.position[i]}\n")
         
         f.close()
