@@ -1,3 +1,4 @@
+from dat import DAT
 from xml_parser import XML
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -21,10 +22,9 @@ class Window(QMainWindow):
 
         #VARIABLES
         self.xml = XML()
-        self.num_xml = 0
-        self.num_dat = 0
-        self.block_trs = 1
-        self.block_dat = 1
+        self.dat = DAT()
+        self.xml_transition = 1
+        self.dat_transition = 1
         self.dat_visible = False
         self.colors = ["r", "y", "g", "c", "b", "m"]
 
@@ -103,57 +103,52 @@ class Window(QMainWindow):
         font = QFontDatabase.addApplicationFont("data/lmromanb.ttf")
         labelStyle = {'color': '#969696', 'font-size': '16px', 'font-family': 'LM Roman 10'}
 
-        self.graph00 = pg.PlotWidget()
-        self.graph01 = pg.PlotWidget()
-        self.graph10 = pg.PlotWidget()
-        self.graph11 = pg.PlotWidget()
+        self.graph_energy = pg.PlotWidget()
+        self.graph_entrp = pg.PlotWidget()
+        self.graph_total = pg.PlotWidget()
 
-        self.graph00.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph01.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph10.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph11.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_energy.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_entrp.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_total.showGrid(x = True, y = True, alpha = 0.8)
 
-        self.graph00.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        self.graph01.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        self.graph10.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        self.graph11.setLabel("bottom", "", units = "x", **labelStyle)
+        self.graph_energy.setLabel("bottom", "t", units = "x", **labelStyle)
+        self.graph_entrp.setLabel("bottom", "t", units = "x", **labelStyle)
+        self.graph_total.setLabel("bottom", "t", units = "x", **labelStyle)
 
-        self.graph00.setLabel("left", "energy", units = "y", **labelStyle)
-        self.graph01.setLabel("left", "entrp", units = "y", **labelStyle)
-        self.graph10.setLabel("left", "total", units = "y", **labelStyle)
-        self.graph11.setLabel("left", "", units = "y", **labelStyle)
+        self.graph_energy.setLabel("left", "energy", units = "y", **labelStyle)
+        self.graph_entrp.setLabel("left", "entrp", units = "y", **labelStyle)
+        self.graph_total.setLabel("left", "total", units = "y", **labelStyle)
 
-        main_layout.addWidget(self.graph00, 0, 0)
-        main_layout.addWidget(self.graph01, 0, 1)
-        main_layout.addWidget(self.graph10, 1, 0)
-        main_layout.addWidget(self.graph11, 1, 1)
+        main_layout.addWidget(self.graph_energy, 0, 1)
+        main_layout.addWidget(self.graph_entrp, 0, 0)
+        main_layout.addWidget(self.graph_total, 1, 1)
 
 
         #GRAPHS DAT
-        self.graph0 = pg.PlotWidget()
-        self.graph1 = pg.PlotWidget()
-        self.graph2 = pg.PlotWidget()
-        self.graph3 = pg.PlotWidget()
+        self.graph_T = pg.PlotWidget()
+        self.graph_EK = pg.PlotWidget()
+        self.graph_SP = pg.PlotWidget()
+        self.graph_SK = pg.PlotWidget()
 
-        self.graph0.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph1.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph2.showGrid(x = True, y = True, alpha = 0.8)
-        self.graph3.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_T.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_EK.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_SP.showGrid(x = True, y = True, alpha = 0.8)
+        self.graph_SK.showGrid(x = True, y = True, alpha = 0.8)
 
-        #self.graph0.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        #self.graph1.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        #self.graph2.setLabel("bottom", "i * POTIM", units = "x", **labelStyle)
-        #self.graph3.setLabel("bottom", "", units = "x", **labelStyle)
+        #self.graph_T.setLabel("bottom", "t", units = "x", **labelStyle)
+        #self.graph_EK.setLabel("bottom", "t", units = "x", **labelStyle)
+        #self.graph_SP.setLabel("bottom", "t", units = "x", **labelStyle)
+        #self.graph_SK.setLabel("bottom", "t", units = "x", **labelStyle)
 
-        self.graph0.setLabel("left", "T", units = "y", **labelStyle)
-        self.graph1.setLabel("left", "EK", units = "y", **labelStyle)
-        self.graph2.setLabel("left", "SP", units = "y", **labelStyle)
-        self.graph3.setLabel("left", "SK", units = "y", **labelStyle)
+        self.graph_T.setLabel("left", "T", units = "y", **labelStyle)
+        self.graph_EK.setLabel("left", "EK", units = "y", **labelStyle)
+        self.graph_SP.setLabel("left", "SP", units = "y", **labelStyle)
+        self.graph_SK.setLabel("left", "SK", units = "y", **labelStyle)
 
-        dat_layout.addWidget(self.graph0)
-        dat_layout.addWidget(self.graph1)
-        dat_layout.addWidget(self.graph2)
-        dat_layout.addWidget(self.graph3)
+        dat_layout.addWidget(self.graph_T)
+        dat_layout.addWidget(self.graph_EK)
+        dat_layout.addWidget(self.graph_SP)
+        dat_layout.addWidget(self.graph_SK)
 
 
 
@@ -166,8 +161,9 @@ class Window(QMainWindow):
             print("EXEC TIME:", time.time() - start_time, "seconds")
             print("----------------------------------------")
             self.plot_vasprun()
-            self.num_xml += 1
-            self.block_trs = self.xml.block
+            XML.num += 1
+            DAT.POTIM = self.xml.POTIM
+            self.xml_transition = self.xml.block
 
 
 
@@ -175,35 +171,10 @@ class Window(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "data", "DAT Files (*.dat)")
 
         if file_name:
-            try:
-                f = open(file_name, "r")
-                t = []
-                T = []
-                EK = []
-                SP = []
-                SK = []
-
-                for l in f:
-                    line = l.split()
-                    if line:
-                        t.append(self.block_dat * self.xml.POTIM)
-                        T.append(float(line[2]))
-                        EK.append(float(line[10]))
-                        SP.append(float(line[12]))
-                        SK.append(float(line[14]))
-                        self.block_dat += 1
-                
-                color = self.colors[self.num_dat%len(self.colors)]
-                self.graph0.plot(t, T, pen = pg.mkPen(color, width = 2))
-                self.graph1.plot(t, EK, pen = pg.mkPen(color, width = 2))
-                self.graph2.plot(t, SP, pen = pg.mkPen(color, width = 2))
-                self.graph3.plot(t, SK, pen = pg.mkPen(color, width = 2))
-                self.num_dat += 1
-
-
-            except:
-                raise Exception("Invalid DAT file")
-                #CLEAR?
+            self.dat.add(file_name)
+            self.plot_dat()
+            DAT.num += 1
+            self.dat_transition = self.dat.block
 
 
 
@@ -219,22 +190,22 @@ class Window(QMainWindow):
 
 
     def clear_vasp(self):
+        DAT.POTIM = 1
         self.xml = XML()
-        self.num_xml = 0
-        self.block_trs = 1
-        self.graph00.clear()
-        self.graph01.clear()
-        self.graph10.clear()
+        self.xml_transition = 1
+        self.graph_energy.clear()
+        self.graph_entrp.clear()
+        self.graph_total.clear()
 
 
 
     def clear_dat(self):
-        self.num_dat = 0
-        self.block_dat = 1
-        self.graph0.clear()
-        self.graph1.clear()
-        self.graph2.clear()
-        self.graph3.clear()
+        self.dat = DAT()
+        self.dat_transition = 1
+        self.graph_T.clear()
+        self.graph_EK.clear()
+        self.graph_SP.clear()
+        self.graph_SK.clear()
 
 
 
@@ -258,16 +229,58 @@ class Window(QMainWindow):
         e_wo_entrp = []
         total = []
 
-        for i in range(self.block_trs, self.xml.block):
+        for i in range(self.xml_transition, self.xml.block):
             t.append(self.xml.t[i])
-            e_fr_energy.append(self.xml.energy[i][0])
-            e_wo_entrp.append(self.xml.energy[i][1])
-            total.append(self.xml.energy[i][2])
+            e_fr_energy.append(self.xml.e_fr_energy[i])
+            e_wo_entrp.append(self.xml.e_wo_entrp[i])
+            total.append(self.xml.total[i])
 
-        color = self.colors[self.num_xml%len(self.colors)]
-        self.graph00.plot(t, e_fr_energy, pen = pg.mkPen(color, width = 2))
-        self.graph01.plot(t, e_wo_entrp, pen = pg.mkPen(color, width = 2))
-        self.graph10.plot(t, total, pen = pg.mkPen(color, width = 2))
+        color = self.colors[XML.num%len(self.colors)]
+
+        min_t = min(self.xml.t.values())
+        max_t = max(self.xml.t.values())
+
+        self.graph_energy.plot(t, e_fr_energy, pen = pg.mkPen(color, width = 2))
+        self.graph_energy.setXRange(min_t, max_t, padding=0)
+        self.graph_energy.setYRange(min(self.xml.e_fr_energy.values()), max(self.xml.e_fr_energy.values()), padding=0)
+        
+        self.graph_entrp.plot(t, e_wo_entrp, pen = pg.mkPen(color, width = 2))
+        self.graph_entrp.setXRange(min_t, max_t, padding=0)
+        self.graph_entrp.setYRange(min(self.xml.e_wo_entrp.values()), max(self.xml.e_wo_entrp.values()), padding=0)
+        
+        self.graph_total.plot(t, total, pen = pg.mkPen(color, width = 2))
+        self.graph_total.setXRange(min_t, max_t, padding=0)
+        self.graph_total.setYRange(min(self.xml.total.values()), max(self.xml.total.values()), padding=0)
+
+
+
+    def plot_dat(self):
+        color = self.colors[DAT.num%len(self.colors)]
+
+        t = self.dat.t[self.dat_transition-1:self.dat.block]
+        T = self.dat.T[self.dat_transition-1:self.dat.block]
+        EK = self.dat.EK[self.dat_transition-1:self.dat.block]
+        SP = self.dat.SP[self.dat_transition-1:self.dat.block]
+        SK = self.dat.SK[self.dat_transition-1:self.dat.block]
+
+        min_t = min(self.dat.t)
+        max_t = max(self.dat.t)
+
+        self.graph_T.plot(t, T, pen = pg.mkPen(color, width = 2))
+        self.graph_T.setXRange(min_t, max_t, padding=0)
+        self.graph_T.setYRange(min(self.dat.T), max(self.dat.T), padding=0)
+
+        self.graph_EK.plot(t, EK, pen = pg.mkPen(color, width = 2))
+        self.graph_EK.setXRange(min_t, max_t, padding=0)
+        self.graph_EK.setYRange(min(self.dat.EK), max(self.dat.EK), padding=0)
+
+        self.graph_SP.plot(t, SP, pen = pg.mkPen(color, width = 2))
+        self.graph_SP.setXRange(min_t, max_t, padding=0)
+        self.graph_SP.setYRange(min(self.dat.SP), max(self.dat.SP), padding=0)
+
+        self.graph_SK.plot(t, SK, pen = pg.mkPen(color, width = 2))
+        self.graph_SK.setXRange(min_t, max_t, padding=0)
+        self.graph_SK.setYRange(min(self.dat.SK), max(self.dat.SK), padding=0) 
 
 
 

@@ -4,16 +4,20 @@ import xml.etree.ElementTree as ET
 
 
 class XML:
+    num = 0
+
     def __init__(self):
         self.basis = dict()
         self.position = dict()
         self.force = dict()
         self.stress = dict()
         self.volume = dict()
-        self.energy = dict()
+        self.e_fr_energy = dict()
+        self.e_wo_entrp = dict()
+        self.total = dict()
         self.t = dict()
         self.block = 1
-        self.POTIM = 1
+        XML.num = 0
 
 
 
@@ -81,9 +85,9 @@ class XML:
                     self.volume[self.block] = float(element.find("structure/crystal/i[@name='volume']").text)
 
                     #ENERGY
-                    self.energy[self.block] = [float(element.find("energy/i[@name='e_fr_energy']").text),
-                                           float(element.find("energy/i[@name='e_wo_entrp']").text),
-                                           float(element.find("energy/i[@name='total']").text)]
+                    self.e_fr_energy[self.block] = float(element.find("energy/i[@name='e_fr_energy']").text)
+                    self.e_wo_entrp[self.block] = float(element.find("energy/i[@name='e_wo_entrp']").text)
+                    self.total[self.block] = float(element.find("energy/i[@name='total']").text)
 
                     #VARIABLES
                     self.t[self.block] = self.block * self.POTIM
