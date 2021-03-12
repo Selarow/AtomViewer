@@ -14,6 +14,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         stylesheet = open("resources/style.css", "r").read()
+        self.setWindowIcon(QIcon("resources/icon.png"))
         self.setWindowTitle("Atom Viewer")
         self.setGeometry(50, 50, 1600, 980)
         self.setStyleSheet(stylesheet)
@@ -310,6 +311,10 @@ class Window(QMainWindow):
 
     def movie(self):
         file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "movie.dat", "Dat Files (*.dat);;All Files (*)")
+
+        if file_name:
+            self.xml.movie(file_name)
+            print("DATA SAVED:", file_name)
 
 
 

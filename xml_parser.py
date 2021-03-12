@@ -138,3 +138,23 @@ class XML:
             f.write(f"{self.e_fr_energy[i]}:{self.num_atoms}:{self.num_types}:{self.position[i]}\n")
         
         f.close()
+
+
+
+    def movie(self, file):
+        f = open(file, "a")
+
+        for i in range(1, self.block):
+            f.write(f"{i}\n")
+            f.write("\n")
+
+            for j in range(len(self.position[i])):
+                basis = self.basis[i]
+                x, y, z = self.position[i][j]
+                bx, by, bz = basis[0][0], basis[1][1], basis[2][2]
+                f.write(f"{j+1}: {x*bx} {y*by} {z*bz}\n")
+
+            f.write("\n")
+            f.write("\n")
+
+        f.close()
