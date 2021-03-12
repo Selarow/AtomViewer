@@ -1,4 +1,2 @@
 /__pycache__
-/data/*
-!/data/style.css
-!/data/lmromanb.ttf
+/data

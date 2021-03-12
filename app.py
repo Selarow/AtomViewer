@@ -13,7 +13,7 @@ import sys
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        stylesheet = open("data/style.css", "r").read()
+        stylesheet = open("resources/style.css", "r").read()
         self.setWindowTitle("Atom Viewer")
         self.setGeometry(50, 50, 1600, 980)
         self.setStyleSheet(stylesheet)
@@ -55,6 +55,16 @@ class Window(QMainWindow):
         dat_control_layout = QHBoxLayout(dat_control_widget)
         dat_control_layout.setContentsMargins(5, 0, 5, 0)
         dat_layout.addWidget(dat_control_widget)
+
+        info_widget = QWidget()
+        info_layout = QGridLayout(info_widget)
+        info_layout.setSpacing(0)
+        main_layout.addWidget(info_widget, 1, 0)
+
+        param_widget = QWidget()
+        param_layout = QHBoxLayout(param_widget)
+        param_layout.setSpacing(0)
+        main_layout.addWidget(param_widget, 2, 0, 2, 1)
 
 
         #BUTTONS
@@ -100,7 +110,7 @@ class Window(QMainWindow):
 
 
         #GRAPHS VASPRUN
-        font = QFontDatabase.addApplicationFont("data/lmromanb.ttf")
+        font = QFontDatabase.addApplicationFont("resources/lmromanb.ttf")
         labelStyle = {'color': '#969696', 'font-size': '16px', 'font-family': 'LM Roman 10'}
 
         self.graph_energy = pg.PlotWidget()
@@ -151,9 +161,60 @@ class Window(QMainWindow):
         dat_layout.addWidget(self.graph_SK)
 
 
+        #INFOS
+        line = QLabel("")
+        info_layout.addWidget(line, 0, 0)
+        vasp_title = QLabel("Vasprun")
+        dat_title = QLabel("Dat")
+        l_num = QLabel("Files")
+        l_last = QLabel("Last")
+        l_block = QLabel("Blocks")
+        info_layout.addWidget(vasp_title, 0, 1, 1, 10)
+        info_layout.addWidget(dat_title, 0, 11, 1, 10)
+        info_layout.addWidget(l_num, 1, 0, 1, 1)
+        info_layout.addWidget(l_last, 2, 0, 1, 1)
+        info_layout.addWidget(l_block, 3, 0, 1, 1)
+
+        self.vasp_num = QLabel("")
+        self.dat_num = QLabel("")
+        self.vasp_block = QLabel("")
+        self.dat_block = QLabel("")
+        self.vasp_last = QLabel("")
+        self.dat_last = QLabel("")
+        info_layout.addWidget(self.vasp_num, 1, 1, 1, 10)
+        info_layout.addWidget(self.dat_num, 1, 11, 1, 10)
+        info_layout.addWidget(self.vasp_last, 2, 1, 1, 10)
+        info_layout.addWidget(self.dat_last, 2, 11, 1, 10)
+        info_layout.addWidget(self.vasp_block, 3, 1, 1, 10)
+        info_layout.addWidget(self.dat_block, 3, 11, 1, 10)
+
+
+        #PARAMS
+        num_atoms_title = QLabel("Atoms:  ")
+        num_types_title = QLabel("Types:  ")
+        potim_title = QLabel("POTIM:  ")
+        num_atoms_title.setObjectName("param")
+        num_types_title.setObjectName("param")
+        potim_title.setObjectName("param")
+
+        self.num_atoms = QLabel("")
+        self.num_types = QLabel("")
+        self.potim = QLabel("")
+        self.num_atoms.setObjectName("num")
+        self.num_types.setObjectName("num")
+        self.potim.setObjectName("num")
+
+        param_layout.addWidget(num_atoms_title)
+        param_layout.addWidget(self.num_atoms)
+        param_layout.addWidget(num_types_title)
+        param_layout.addWidget(self.num_types)
+        param_layout.addWidget(potim_title)
+        param_layout.addWidget(self.potim)
+
+
 
     def open_vasprun(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "data", "XML Files (*.xml)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "XML Files (*.xml)")
 
         if file_name:
             start_time = time.time()
@@ -163,18 +224,36 @@ class Window(QMainWindow):
             self.plot_vasprun()
             XML.num += 1
             DAT.POTIM = self.xml.POTIM
-            self.xml_transition = self.xml.block
+            tmp = self.xml.block - 1 if self.xml_transition == 1 else self.xml.block - 1 - self.xml_transition
+            self.vasp_num.setText(str(XML.num))
+            self.vasp_last.setText(str(tmp))
+            self.vasp_block.setText(str(self.xml.block - 1))
+            self.num_atoms.setText(str(self.xml.num_atoms))
+            self.num_types.setText(str(self.xml.num_types))
+            self.potim.setText(str(self.xml.POTIM))
+            self.xml_transition = self.xml.block - 1
+
+            if self.xml.NSW != tmp:
+                self.vasp_last.setStyleSheet("color: red")
+                self.vasp_block.setStyleSheet("color: red")
+
+            else:
+                self.vasp_last.setStyleSheet("")
 
 
 
     def open_dat(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "data", "DAT Files (*.dat)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "DAT Files (*.dat)")
 
         if file_name:
             self.dat.add(file_name)
             self.plot_dat()
             DAT.num += 1
-            self.dat_transition = self.dat.block
+            tmp = 0 if self.dat_transition == 1 else self.dat_transition
+            self.dat_num.setText(str(DAT.num))
+            self.dat_block.setText(str(self.dat.block - 1))
+            self.dat_last.setText(str(self.dat.block - 1 - tmp))
+            self.dat_transition = self.dat.block - 1
 
 
 
@@ -193,6 +272,14 @@ class Window(QMainWindow):
         DAT.POTIM = 1
         self.xml = XML()
         self.xml_transition = 1
+        self.vasp_num.setText("")
+        self.vasp_last.setText("")
+        self.vasp_block.setText("")
+        self.num_atoms.setText("")
+        self.num_types.setText("")
+        self.potim.setText("")
+        self.vasp_last.setStyleSheet("")
+        self.vasp_block.setStyleSheet("")
         self.graph_energy.clear()
         self.graph_entrp.clear()
         self.graph_total.clear()
@@ -202,6 +289,9 @@ class Window(QMainWindow):
     def clear_dat(self):
         self.dat = DAT()
         self.dat_transition = 1
+        self.dat_num.setText("")
+        self.dat_last.setText("")
+        self.dat_block.setText("")
         self.graph_T.clear()
         self.graph_EK.clear()
         self.graph_SP.clear()
@@ -210,7 +300,7 @@ class Window(QMainWindow):
 
 
     def save(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "data/data.txt", "Text Files (*.txt);;All Files (*)")
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "data.dat", "Dat Files (*.dat);;All Files (*)")
 
         if file_name:
             self.xml.save(file_name)
@@ -219,7 +309,7 @@ class Window(QMainWindow):
 
 
     def movie(self):
-        pass
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "movie.dat", "Dat Files (*.dat);;All Files (*)")
 
 
 
