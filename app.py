@@ -1,3 +1,4 @@
+from numpy import empty
 from dat import DAT
 from xml_parser import XML
 from PyQt5.QtWidgets import *
@@ -6,6 +7,18 @@ from PyQt5.QtGui import *
 import pyqtgraph as pg
 import time
 import sys
+
+
+
+
+class Window2(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        stylesheet = open("resources/style.css", "r").read()
+        self.setWindowIcon(QIcon("resources/icon.png"))
+        self.setWindowTitle("Details")
+        self.setGeometry(100, 100, 400, 800)
+        self.setStyleSheet(stylesheet)
 
 
 
@@ -24,6 +37,7 @@ class Window(QMainWindow):
         #VARIABLES
         self.xml = XML()
         self.dat = DAT()
+        self.empty_vasp = True
         self.xml_transition = 1
         self.dat_transition = 1
         self.dat_visible = False
@@ -32,6 +46,7 @@ class Window(QMainWindow):
 
 
     def UI(self):
+        #MAIN WINDOW
         #WIDGETS/LAYOUTS
         main_widget = QWidget()
         main_layout = QGridLayout(main_widget)
@@ -81,6 +96,10 @@ class Window(QMainWindow):
         clear_vasp_button.clicked.connect(self.clear_vasp)
         control_top_layout.addWidget(clear_vasp_button)
 
+        details_button = QPushButton("Details", self)
+        details_button.clicked.connect(self.toggle_details)
+        control_top_layout.addWidget(details_button)
+
         save_button = QPushButton("Save", self)
         save_button.clicked.connect(self.save)
         control_bot_layout.addWidget(save_button)
@@ -88,6 +107,10 @@ class Window(QMainWindow):
         movie_button = QPushButton("Movie", self)
         movie_button.clicked.connect(self.movie)
         control_bot_layout.addWidget(movie_button)
+
+        json_button = QPushButton("Json", self)
+        json_button.clicked.connect(self.json)
+        control_bot_layout.addWidget(json_button)
 
         open_dat_button = QPushButton("Open .dat", self)
         open_dat_button.clicked.connect(self.open_dat)
@@ -214,6 +237,67 @@ class Window(QMainWindow):
 
 
 
+        #DETAILS WINDOW
+        self.w = Window2()
+        details_widget = QWidget()
+        details_layout = QVBoxLayout(details_widget)
+
+        tabs = QTabWidget()
+        self.input_widget = QLineEdit(self)
+        self.table_basis = QTableWidget()
+        self.table_position = QTableWidget()
+        self.table_force = QTableWidget()
+        self.table_stress = QTableWidget()
+        
+        tabs.addTab(self.table_basis, "Basis")
+        tabs.addTab(self.table_position, "Position")
+        tabs.addTab(self.table_force, "Force")
+        tabs.addTab(self.table_stress, "Stress")
+
+        ok_button = QPushButton("Ok", self)
+        ok_button.clicked.connect(self.update_details)
+
+        details_layout.addWidget(self.input_widget)
+        details_layout.addWidget(ok_button)
+        details_layout.addWidget(tabs)
+        self.w.setCentralWidget(details_widget)
+
+        self.table_basis.setColumnCount(3)
+        self.table_basis.setRowCount(3)
+        header = self.table_basis.horizontalHeader()
+        self.table_basis.setHorizontalHeaderLabels(["", "", ""])
+        self.table_basis.setVerticalHeaderLabels(["", "", ""])
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+        self.table_stress.setColumnCount(3)
+        self.table_stress.setRowCount(3)
+        header = self.table_stress.horizontalHeader()
+        self.table_stress.setHorizontalHeaderLabels(["", "", ""])
+        self.table_stress.setVerticalHeaderLabels(["", "", ""])
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+        self.table_position.setColumnCount(3)
+        self.table_position.setRowCount(0)
+        header = self.table_position.horizontalHeader() 
+        self.table_position.setHorizontalHeaderLabels(["x", "y", "z"])
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+        self.table_force.setColumnCount(3)
+        self.table_force.setRowCount(0)
+        header = self.table_force.horizontalHeader()
+        self.table_force.setHorizontalHeaderLabels(["x", "y", "z"])
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+
+
+
     def open_vasprun(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "XML Files (*.xml)")
 
@@ -223,6 +307,8 @@ class Window(QMainWindow):
             print("EXEC TIME:", time.time() - start_time, "seconds")
             print("----------------------------------------")
             self.plot_vasprun()
+            self.empty_vasp = False
+            self.update_details()
             XML.num += 1
             DAT.POTIM = self.xml.POTIM
             tmp = self.xml.block - 1 if self.xml_transition == 1 else self.xml.block - 1 - self.xml_transition
@@ -273,6 +359,7 @@ class Window(QMainWindow):
         DAT.POTIM = 1
         self.xml = XML()
         self.xml_transition = 1
+        self.empty_vasp = True
         self.vasp_num.setText("")
         self.vasp_last.setText("")
         self.vasp_block.setText("")
@@ -284,6 +371,15 @@ class Window(QMainWindow):
         self.graph_energy.clear()
         self.graph_entrp.clear()
         self.graph_total.clear()
+
+
+
+    def toggle_details(self):
+        if self.w.isVisible():
+            self.w.hide()
+        
+        else:
+            self.w.show()
 
 
 
@@ -310,10 +406,19 @@ class Window(QMainWindow):
 
 
     def movie(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "movie.dat", "Dat Files (*.dat);;All Files (*)")
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "movie.xyz", "Dat Files (*.xyz);;All Files (*)")
 
         if file_name:
             self.xml.movie(file_name)
+            print("DATA SAVED:", file_name)
+
+
+
+    def json(self):
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "data.json", "Dat Files (*.json);;All Files (*)")
+
+        if file_name:
+            self.xml.save_json(file_name)
             print("DATA SAVED:", file_name)
 
 
@@ -375,11 +480,50 @@ class Window(QMainWindow):
 
         self.graph_SK.plot(t, SK, pen = pg.mkPen(color, width = 2))
         self.graph_SK.setXRange(min_t, max_t, padding=0)
-        self.graph_SK.setYRange(min(self.dat.SK), max(self.dat.SK), padding=0) 
+        self.graph_SK.setYRange(min(self.dat.SK), max(self.dat.SK), padding=0)
+
+
+
+    def update_details(self):
+        if self.empty_vasp == False:
+            
+            if self.input_widget.text().isnumeric():
+                self.input_widget.setStyleSheet("color: #000000;")
+                num_block = int(self.input_widget.text())
+
+                if 1 <= num_block < self.xml.block:
+                    self.input_widget.setStyleSheet("color: #000000;")
+                    self.table_position.setRowCount(self.xml.num_atoms)
+                    self.table_force.setRowCount(self.xml.num_atoms)
+
+                    #BASIS/STRESS
+                    for i in range(3):
+                        for j in range(3):
+                            self.table_basis.setItem(i, j, QTableWidgetItem(str(self.xml.basis[num_block][i][j])))
+                            self.table_stress.setItem(i, j, QTableWidgetItem(str(self.xml.stress[num_block][i][j])))
+
+                    #POSITION/FORCE
+                    for i in range(self.xml.num_atoms):
+                        self.table_position.setItem(i, 0, QTableWidgetItem(str(self.xml.position[num_block][i][0])))
+                        self.table_position.setItem(i, 1, QTableWidgetItem(str(self.xml.position[num_block][i][1])))
+                        self.table_position.setItem(i, 2, QTableWidgetItem(str(self.xml.position[num_block][i][2])))
+
+                        self.table_force.setItem(i, 0, QTableWidgetItem(str(self.xml.force[num_block][i][0])))
+                        self.table_force.setItem(i, 1, QTableWidgetItem(str(self.xml.force[num_block][i][1])))
+                        self.table_force.setItem(i, 2, QTableWidgetItem(str(self.xml.force[num_block][i][2])))
+
+                    print("UPDATED")
+                
+                else:
+                    self.input_widget.setStyleSheet("color: #d10003;")
+            
+            else:
+                self.input_widget.setStyleSheet("color: #d10003;")
 
 
 
 
-app = QApplication(sys.argv)
-window = Window()
-sys.exit(app.exec())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = Window()
+    sys.exit(app.exec())

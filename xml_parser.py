@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import json
 
 
 
@@ -16,6 +17,7 @@ class XML:
         self.e_wo_entrp = dict()
         self.total = dict()
         self.t = dict()
+        self.types = []
         self.block = 1
         XML.num = 0
 
@@ -34,6 +36,8 @@ class XML:
                 elif element.tag == "atominfo":
                     self.num_atoms = int(element.find("atoms").text)
                     self.num_types = int(element.find("types").text)
+                    for e in element.find("array[@name='atoms']/set"):
+                        self.types.append(e.find("c").text)
                     element.clear()
 
                 #KPOINTS
@@ -58,28 +62,28 @@ class XML:
                 #CALCULATION
                 elif element.tag == "calculation":
                     #BASIS
-                    basis = []
+                    tmp_basis = []
                     for v in element.find("structure/crystal/varray[@name='basis']"):
-                        basis.append([float(k) for k in v.text.split()])
-                    self.basis[self.block] = basis
+                        tmp_basis.append([float(k) for k in v.text.split()])
+                    self.basis[self.block] = tmp_basis
 
                     #POSITION
-                    position = []
+                    tmp_position = []
                     for v in element.find("structure/varray[@name='positions']"):
-                        position.append([float(k) for k in v.text.split()])
-                    self.position[self.block] = position
+                        tmp_position.append([float(k) for k in v.text.split()])
+                    self.position[self.block] = tmp_position
 
                     #FORCE
-                    force = []
+                    tmp_force = []
                     for v in element.find("varray[@name='forces']"):
-                        force.append([float(k) for k in v.text.split()])
-                    self.force[self.block] = force
+                        tmp_force.append([float(k) for k in v.text.split()])
+                    self.force[self.block] = tmp_force
 
                     #STRESS
-                    stress = []
+                    tmp_stress = []
                     for v in element.find("varray[@name='stress']"):
-                        stress.append([float(k) for k in v.text.split()])
-                    self.stress[self.block] = stress
+                        tmp_stress.append([float(k) for k in v.text.split()])
+                    self.stress[self.block] = tmp_stress
 
                     #VOLUME
                     self.volume[self.block] = float(element.find("structure/crystal/i[@name='volume']").text)
@@ -152,9 +156,37 @@ class XML:
                 basis = self.basis[i]
                 x, y, z = self.position[i][j]
                 bx, by, bz = basis[0][0], basis[1][1], basis[2][2]
-                f.write(f"{j+1}: {x*bx} {y*by} {z*bz}\n")
+                f.write(f"{self.types[j]}   {x*bx}   {y*by}   {z*bz}\n")
 
             f.write("\n")
             f.write("\n")
 
+        f.close()
+
+
+
+    def save_json(self, file):
+        data = []
+
+        for i in range(1, self.block):
+            istep = {}
+            istep["energy"] = self.e_wo_entrp[i]
+            istep["stress"] = self.stress[i]
+            istep["volume"] = self.volume[i]
+            
+            atoms = []
+
+            for j in range(self.num_atoms):
+                atom_dict = {}
+                atom_dict["id"] = j
+                atom_dict["symbol"] = self.types[j]
+                atom_dict["ordered_distances"] = {}
+                atom_dict["forces"] = {}
+                atoms.append(atom_dict)
+            
+            istep["atoms"] = atoms
+            data.append(istep)
+        
+        f = open(file, "a")
+        json.dump(data, f)
         f.close()

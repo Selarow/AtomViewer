@@ -3,10 +3,12 @@ QWidget {
 }
 
 QPushButton {
-    background-color: #3c3c3c;
+    background-color: #3C3C3C;
     border-style: solid;
     height: 30px;
-    color: #bfbfbf;
+    color: #BFBFBF;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 QPushButton:hover {
@@ -20,7 +22,7 @@ QWidget#dat {
 
 QLabel {
     qproperty-alignment: AlignCenter;
-    color: #bfbfbf;
+    color: #BFBFBF;
     font-size: 18px;
     border-bottom: 1px solid rgba(191, 191, 191, 0.2);
 }
@@ -33,4 +35,131 @@ QLabel#param {
 QLabel#num {
     qproperty-alignment: "AlignVCenter | AlignLeft";
     border-bottom: 0px;
+}
+
+QLineEdit {
+    qproperty-alignment: AlignCenter;
+    background-color: #BFBFBF;
+    border: 0px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QScrollBar:vertical {
+    background: #424242;
+    border: 2px solid #424242;
+    border-left: 1px solid #424242;
+    width: 17px;
+    margin: 15px 0px 15px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #686868;
+    min-height: 20px;
+}
+
+QScrollBar::add-line:vertical {
+    background: #424242;
+    border: 2px solid #424242;
+    height: 20px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    background: #424242;
+    border: 2px solid #424242;
+    height: 20px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+    background: #424242;
+    border: 2px solid #424242;
+    height: 17px;
+    margin: 0px 15px 0px 15px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #686868;
+    min-width: 20px;
+}
+
+QScrollBar::add-line:horizontal {
+    background: #424242;
+    border: 2px solid #424242;
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    background: #424242;
+    border: 2px solid #424242;
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QTabWidget::pane {
+    border-top: 0px;
+}
+
+QTabBar::tab {
+    width: 80px;
+    height: 25px;
+    background: #3C3C3C;
+    color: #BFBFBF;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QTabWidget::tab-bar {
+    alignment: center;
+}
+
+QTabBar::tab:hover {
+    background-color: #505050;
+}
+
+QTabBar::tab:selected {
+    background-color: #505050;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 0px;
+}
+
+QTableWidget {
+    gridline-color: #444444;
+    border: 3px solid #1F1F20;
+}
+
+QTableView {
+    selection-background-color: #505050;
+    color: #bfbfbf;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QTableView QTableCornerButton::section {
+    background: #3C3C3C;
+    border: 0px;
+}
+
+QHeaderView::section {
+    background-color: #3C3C3C;
+    border-style: 0px;
+    color: #BFBFBF;
+    font-size: 12px;
+    font-weight: bold;
 }
