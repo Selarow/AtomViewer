@@ -1,4 +1,3 @@
-from numpy import empty
 from dat import DAT
 from xml_parser import XML
 from PyQt5.QtWidgets import *
