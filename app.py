@@ -247,6 +247,11 @@ class Window(QMainWindow):
         self.table_position = QTableWidget()
         self.table_force = QTableWidget()
         self.table_stress = QTableWidget()
+
+        self.table_basis.setFocusPolicy(Qt.NoFocus)
+        self.table_position.setFocusPolicy(Qt.NoFocus)
+        self.table_force.setFocusPolicy(Qt.NoFocus)
+        self.table_stress.setFocusPolicy(Qt.NoFocus)
         
         tabs.addTab(self.table_basis, "Basis")
         tabs.addTab(self.table_position, "Position")

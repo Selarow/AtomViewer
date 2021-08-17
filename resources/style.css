@@ -15,6 +15,10 @@ QPushButton:hover {
     background-color: #505050;
 }
 
+QPushButton:pressed {
+    background-color: #3C3C3C;
+}
+
 QWidget#dat {
     border-right: 1px solid rgba(191, 191, 191, 0.2);
     border-bottom: 1px solid rgba(191, 191, 191, 0.2);
@@ -46,30 +50,33 @@ QLineEdit {
 }
 
 QScrollBar:vertical {
-    background: #424242;
-    border: 2px solid #424242;
-    border-left: 1px solid #424242;
+    background: #444444;
+    border: 2px solid #444444;
+    border-left: 1px solid #444444;
     width: 17px;
-    margin: 15px 0px 15px 0px;
+    margin: 23px 0px 0px 0px;
 }
 
 QScrollBar::handle:vertical {
     background: #686868;
-    min-height: 20px;
+    min-height: 10px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #7B7B7B;
+}
+
+QScrollBar::handle:vertical:pressed {
+    background: #A1A1A1;
 }
 
 QScrollBar::add-line:vertical {
-    background: #424242;
-    border: 2px solid #424242;
-    height: 20px;
-    subcontrol-position: bottom;
-    subcontrol-origin: margin;
+    background: #444444;
 }
 
 QScrollBar::sub-line:vertical {
-    background: #424242;
-    border: 2px solid #424242;
-    height: 20px;
+    background: #444444;
+    height: 23px;
     subcontrol-position: top;
     subcontrol-origin: margin;
 }
@@ -79,10 +86,10 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 
 QScrollBar:horizontal {
-    background: #424242;
-    border: 2px solid #424242;
+    background: #444444;
+    border: 2px solid #444444;
     height: 17px;
-    margin: 0px 15px 0px 15px;
+    margin: 0px 0px 0px 0px;
 }
 
 QScrollBar::handle:horizontal {
@@ -90,20 +97,20 @@ QScrollBar::handle:horizontal {
     min-width: 20px;
 }
 
+QScrollBar::handle:horizontal:hover {
+    background: #7B7B7B;
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background: #A1A1A1;
+}
+
 QScrollBar::add-line:horizontal {
-    background: #424242;
-    border: 2px solid #424242;
-    width: 20px;
-    subcontrol-position: right;
-    subcontrol-origin: margin;
+    background: #444444;
 }
 
 QScrollBar::sub-line:horizontal {
-    background: #424242;
-    border: 2px solid #424242;
-    width: 20px;
-    subcontrol-position: left;
-    subcontrol-origin: margin;
+    background: #444444;
 }
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
@@ -135,7 +142,7 @@ QTabBar::tab:selected {
     background-color: #505050;
 }
 
-QTabBar::tab:!selected {
+QTabBar::tab:not(selected) {
     margin-top: 0px;
 }
 
@@ -145,19 +152,24 @@ QTableWidget {
 }
 
 QTableView {
-    selection-background-color: #505050;
-    color: #bfbfbf;
+    selection-background-color: #686868;
+    selection-color: #1F1F20;
+    color: #BFBFBF;
     font-size: 12px;
     font-weight: bold;
 }
 
+QTableView:focus {
+    border: 1px solid red;
+}
+
 QTableView QTableCornerButton::section {
-    background: #3C3C3C;
+    background: #444444;
     border: 0px;
 }
 
 QHeaderView::section {
-    background-color: #3C3C3C;
+    background-color: #444444;
     border-style: 0px;
     color: #BFBFBF;
     font-size: 12px;
